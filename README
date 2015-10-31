@@ -1,0 +1,35 @@
+# This directory contains the Makefile for the OpenWRT build system
+# The source code is contained inside
+# the src/ directory to avoid having to download it separately.
+
+# To build, you must have a copy of the OpenWRT source tree
+# currently at version 15.05 (Chaos Calmer)
+# instructions here: http://wiki.openwrt.org/doc/howto/buildroot.exigence
+
+## install pre-requisites (Debian/Ubuntu instructions)
+sudo apt-get install git-core build-essential libssl-dev libncurses5-dev unzip
+## clone the OpenWRT Chaos Calmer release
+git clone git://git.openwrt.org/15.05/openwrt.git
+## build the toolchain
+cd openwrt/
+make tools/install
+make toolchain/install
+
+cp -pRv load2sqlite package/utils/
+
+make menuconfig
+## we currently use the Nexx WT3020H, which is an RAMIPS platform
+## Select the following options to build for ramips:
+
+# Target System -> Ralink RT288x/RT3xxx
+# Subtarget -> MT7620 based boards
+# Target Profile -> Default Profile
+
+## Select the load2sqlite package
+# Utilities -> load2sqlite [M]
+
+## build the package (dependencies should be automatically built)
+make package/load2sqlite/compile
+
+## you can find the output package in
+bin/ramips/packages/base/load2sqlite_$(PKG_VERSION)-$(PKG_RELEASE)_$(PLATFORM).ipk
